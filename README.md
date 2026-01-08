@@ -17,10 +17,10 @@ The system is comprised of the following components:
 Task | Notes | Resolved?
 --- | --- | ---
 Figure out new routine | - | ✅
-Set up DB | - | ✅
-Set up Kotlin app skeleton | in progress | -
-Create login/auth page | - | -
-Get auth working | - | -
-Get DB query results | - | -
+Set up DB | need to revisit? | ✅
+Set up Kotlin app skeleton | - | ✅
+Create login/auth page | - | ✅
+Get auth working | - | ✅
+Get DB query results | in progress | -
 Create workout info page | - | -
 Make UI pretty | - | - 
