@@ -17,8 +17,9 @@ import kotlinx.coroutines.launch
 object SupabaseClient {
     val client by lazy {
         createSupabaseClient(
-            supabaseUrl = "https://qunlvbcbdxdbyhzqlzor.supabase.co",
-            supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1bmx2YmNiZHhkYnloenFsem9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMjA5OTMsImV4cCI6MjA3MTg5Njk5M30.IJcWQU0xe_2DQhFSqHMjehQtI-pOVutj4mCiCC_egd4"
+                supabaseUrl = "https://qunlvbcbdxdbyhzqlzor.supabase.co",
+                supabaseKey =
+                        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1bmx2YmNiZHhkYnloenFsem9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMjA5OTMsImV4cCI6MjA3MTg5Njk5M30.IJcWQU0xe_2DQhFSqHMjehQtI-pOVutj4mCiCC_egd4"
         ) {
             install(Auth)
             install(Postgrest)
@@ -27,7 +28,7 @@ object SupabaseClient {
 }
 
 class LoginActivity : AppCompatActivity() {
-    
+
     private lateinit var emailInput: TextInputEditText
     private lateinit var passwordInput: TextInputEditText
     private lateinit var loginButton: MaterialButton
@@ -43,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton.setOnClickListener {
             val email = emailInput.text.toString()
             val password = passwordInput.text.toString()
-            
+
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 login(email, password)
             } else {
@@ -62,7 +63,8 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
                 navigateToInfo()
             } catch (e: Exception) {
-                Toast.makeText(this@LoginActivity, "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@LoginActivity, "Login failed: ${e.message}", Toast.LENGTH_LONG)
+                        .show()
             }
         }
     }
