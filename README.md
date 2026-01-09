@@ -22,5 +22,6 @@ Set up Kotlin app skeleton | - | ✅
 Create login/auth page | - | ✅
 Create workout info page | - | ✅
 Get auth working | - | ✅
-Get DB query results | need to do some reformatting | -
-Make UI pretty | in progress | - 
+Get DB query results | - | ✅
+Make UI pretty | it's plain, but it's exactly what I need | ✅
+Add rotating schedule | in progress | - 
