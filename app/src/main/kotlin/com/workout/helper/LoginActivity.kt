@@ -31,7 +31,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var emailInput: TextInputEditText
     private lateinit var passwordInput: TextInputEditText
     private lateinit var loginButton: MaterialButton
-    private lateinit var signupButton: MaterialButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +39,6 @@ class LoginActivity : AppCompatActivity() {
         emailInput = findViewById(R.id.emailInput)
         passwordInput = findViewById(R.id.passwordInput)
         loginButton = findViewById(R.id.loginButton)
-        signupButton = findViewById(R.id.signupButton)
 
         loginButton.setOnClickListener {
             val email = emailInput.text.toString()
@@ -48,17 +46,6 @@ class LoginActivity : AppCompatActivity() {
             
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 login(email, password)
-            } else {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        signupButton.setOnClickListener {
-            val email = emailInput.text.toString()
-            val password = passwordInput.text.toString()
-            
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                signup(email, password)
             } else {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             }
@@ -76,20 +63,6 @@ class LoginActivity : AppCompatActivity() {
                 navigateToInfo()
             } catch (e: Exception) {
                 Toast.makeText(this@LoginActivity, "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun signup(email: String, password: String) {
-        lifecycleScope.launch {
-            try {
-                SupabaseClient.client.auth.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
-                Toast.makeText(this@LoginActivity, "Signup successful! Please check your email.", Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                Toast.makeText(this@LoginActivity, "Signup failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

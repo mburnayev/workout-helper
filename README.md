@@ -20,7 +20,7 @@ Figure out new routine | - | ✅
 Set up DB | need to revisit? | ✅
 Set up Kotlin app skeleton | - | ✅
 Create login/auth page | - | ✅
+Create workout info page | - | ✅
 Get auth working | - | ✅
-Get DB query results | in progress | -
-Create workout info page | - | -
-Make UI pretty | - | - 
+Get DB query results | need to do some reformatting | -
+Make UI pretty | in progress | - 
