@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.launch
+import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonObject
 
 class InfoActivity : AppCompatActivity() {
@@ -38,68 +39,118 @@ class InfoActivity : AppCompatActivity() {
         }
     }
 
+    //  querying based on: day of week, week of month (roughly)
+    //  day -> week cycle: Legs/Pull/Push, Pull/Legs/Push, Legs/Push/Pull, Push/Legs/Pull
+    //  week -> month cycle: d->w cycle x 13 weeks = 52 weeks, one year plan
     private fun fetchDailyWorkout() {
         lifecycleScope.launch {
             try {
                 val client = SupabaseClient.client
 
-                // 1. SELECT * FROM workout_exercises WHERE day = 'Push' AND "group" = 'Compound'
-                // ORDER BY RANDOM() LIMIT 2
-                // Logic: Fetch all matching, shuffle, take 2
-                val compoundList =
-                        client.from("workout_exercises")
-                                .select {
-                                    filter {
-                                        eq("day", "Push")
-                                        eq("group", "Compound")
-                                    }
-                                }
-                                .decodeList<JsonObject>()
-                val compound = compoundList.shuffled().take(2)
+                // dayOfWeek/isoDayNumber docs: MONDAY - SUNDAY/1-7
+                val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                val todayEnum = today.dayOfWeek
+                val todayNum = todayEnum.isoDayNumber
 
-                // 2. SELECT * FROM workout_exercises WHERE day = 'Push' and "group" = 'Abs'
-                val abs =
-                        client.from("workout_exercises")
-                                .select {
-                                    filter {
-                                        eq("day", "Push")
-                                        eq("group", "Abs")
-                                    }
-                                }
-                                .decodeList<JsonObject>()
+                val anchorDate = LocalDate(2026, 1, 5) // a Monday
+                val weeksSinceAnchor = today.minus(anchorDate).days / 7
+                val weekCycle = weeksSinceAnchor % 4
 
-                // 3. SELECT * FROM workout_exercises WHERE day = 'Push' AND "group" = 'Isolated'
-                // ORDER BY RANDOM() LIMIT 1
-                val isolatedList =
-                        client.from("workout_exercises")
-                                .select {
-                                    filter {
-                                        eq("day", "Push")
-                                        eq("group", "Isolated")
-                                    }
-                                }
-                                .decodeList<JsonObject>()
-                val isolated = isolatedList.shuffled().take(1)
+                // Default fallback
+                var muscleGroup = "Push"
 
-                val combined = compound + abs + isolated
-
-                // Display results
                 val sb = StringBuilder()
                 sb.append(infoText.text).append("\n\n--- Today's Workout ---\n")
 
-                var iteration = 0
-                combined.forEach { json ->
-                    // Try to get "name" or "exercise" field, otherwise dump json
-                    // Accessing generic JsonObject
-                    val nameElement = json["exercise"]
-                    val name = nameElement.toString().trim('"')
-                    val weight = json["weight"]
-                    val sets = if (iteration == 2) 3 else 4
-                    val reps = if (iteration == 0 || iteration == 2) 8 else 10
-                    sb.append("- $name, $sets x $reps @ $weight\n")
-                    iteration += 1
-                }
+                if (todayNum == 2 || todayNum == 4) {
+                    sb.append("Cardio day, go run 2-3 miles")
+                } else if (todayNum == 6 || todayNum == 7) {
+                    sb.append("Rest time :)")
+                } else {
+                    muscleGroup =
+                            when (weekCycle) {
+                                0 -> { // Week 1
+                                    when (todayNum) {
+                                        1 -> "Legs"
+                                        3 -> "Pull"
+                                        else -> "Push"
+                                    }
+                                }
+                                1 -> { // Week 2
+                                    when (todayNum) {
+                                        1 -> "Pull"
+                                        3 -> "Legs"
+                                        else -> "Push"
+                                    }
+                                }
+                                2 -> { // Week 3
+                                    when (todayNum) {
+                                        1 -> "Legs"
+                                        3 -> "Push"
+                                        else -> "Pull"
+                                    }
+                                }
+                                else -> { // Week 4
+                                    when (todayNum) {
+                                        1 -> "Push"
+                                        3 -> "Legs"
+                                        else -> "Pull"
+                                    }
+                                }
+                            }
 
+                    // 1. SELECT * FROM workout_exercises WHERE day = 'Push' AND "group" =
+                    // 'Compound'
+                    // ORDER BY RANDOM() LIMIT 2
+                    // Logic: Fetch all matching, shuffle, take 2
+                    val compoundList =
+                            client.from("workout_exercises")
+                                    .select {
+                                        filter {
+                                            eq("day", "$muscleGroup")
+                                            eq("group", "Compound")
+                                        }
+                                    }
+                                    .decodeList<JsonObject>()
+                    val compound = compoundList.shuffled().take(2)
+
+                    // 2. SELECT * FROM workout_exercises WHERE day = 'Push' and "group" = 'Abs'
+                    val abs =
+                            client.from("workout_exercises")
+                                    .select {
+                                        filter {
+                                            eq("day", "$muscleGroup")
+                                            eq("group", "Abs")
+                                        }
+                                    }
+                                    .decodeList<JsonObject>()
+
+                    // 3. SELECT * FROM workout_exercises WHERE day = 'Push' AND "group" =
+                    // 'Isolated'
+                    // ORDER BY RANDOM() LIMIT 1
+                    val isolatedList =
+                            client.from("workout_exercises")
+                                    .select {
+                                        filter {
+                                            eq("day", "$muscleGroup")
+                                            eq("group", "Isolated")
+                                        }
+                                    }
+                                    .decodeList<JsonObject>()
+                    val isolated = isolatedList.shuffled().take(1)
+
+                    val combined = compound + abs + isolated
+
+                    // Display results
+                    combined.forEach { json ->
+                        val nameElement = json["exercise"]
+                        val name = nameElement.toString().trim('"')
+                        val weight = json["weight"]
+                        val sets = json["sets"]
+                        val reps = json["reps"]
+                        sb.append("- $name, $sets x $reps @ $weight\n")
+                    }
+                }
                 infoText.text = sb.toString()
             } catch (e: Exception) {
                 e.printStackTrace()
