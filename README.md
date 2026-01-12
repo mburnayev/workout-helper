@@ -30,6 +30,6 @@ Create workout info page | - | ✅
 Get auth working | - | ✅
 Get DB query results | - | ✅
 Make UI pretty | it's plain, but it's exactly what I need | ✅
-Add rotating schedule | in progress | - 
+Add rotating schedule | now to see that it works | ✅
 Add workout feedback section? | I could also add the ability to update my exercise weight here | -
 

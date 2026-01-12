@@ -100,9 +100,7 @@ class InfoActivity : AppCompatActivity() {
                             }
 
                     // 1. SELECT * FROM workout_exercises WHERE day = 'Push' AND "group" =
-                    // 'Compound'
-                    // ORDER BY RANDOM() LIMIT 2
-                    // Logic: Fetch all matching, shuffle, take 2
+                    // 'Compound' ORDER BY RANDOM() LIMIT 2
                     val compoundList =
                             client.from("workout_exercises")
                                     .select {
@@ -126,8 +124,7 @@ class InfoActivity : AppCompatActivity() {
                                     .decodeList<JsonObject>()
 
                     // 3. SELECT * FROM workout_exercises WHERE day = 'Push' AND "group" =
-                    // 'Isolated'
-                    // ORDER BY RANDOM() LIMIT 1
+                    // 'Isolated' ORDER BY RANDOM() LIMIT 1
                     val isolatedList =
                             client.from("workout_exercises")
                                     .select {
